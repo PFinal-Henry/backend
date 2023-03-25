@@ -1,21 +1,97 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 
-// Controlador para actualizar ventas de productos
-const updateProductSales = async (orderId) => {
+// Obtener todos los productos
+const getAllProducts = async (req, res) => {
   try {
-    const order = await Order.findById(orderId).populate("products.product");
-    if (!order) {
-      return console.log("Order not found");
+    const products = await Product.find({});
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Obtener un producto por id
+const getProductById = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado" });
     }
-    for (let item of order.products) {
-      await Product.findByIdAndUpdate(item.product._id, {
-        $inc: { sales: item.quantity },
-      });
+    res.status(200).json(product);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Crear un producto nuevo
+const createProduct = async (req, res) => {
+  const product = new Product({
+    name: req.body.name,
+    description: req.body.description,
+    price: req.body.price,
+    model: req.body.model,
+    brand: req.body.brand,
+    category: req.body.category,
+    stock: req.body.stock,
+    images: req.body.images,
+  });
+  try {
+    const newProduct = await product.save();
+    res.status(201).json(newProduct);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Actualizar un producto
+const updateProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado" });
     }
-    console.log("Product sales updated successfully");
-  } catch (err) {
-    console.error(err);
+    product.name = req.body.name;
+    product.description = req.body.description;
+    product.price = req.body.price;
+    product.model = req.body.model;
+    product.brand = req.body.brand;
+    product.category = req.body.category;
+    product.stock = req.body.stock;
+    product.images = req.body.images;
+
+    const updatedProduct = await product.save();
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Eliminar un producto
+const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+    await product.remove();
+    res.status(200).json({ message: "Producto eliminado correctamente" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Actualizar el número de ventas de un producto
+const updateProductSales = async (productId, numSales) => {
+  try {
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error("Producto no encontrado");
+    }
+    product.sales += numSales;
+    await product.save();
+  } catch (error) {
+    throw new Error(error.message);
   }
 };
 
@@ -42,6 +118,11 @@ const updateProductStock = async (orderId) => {
 };
 
 module.exports = {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
   updateProductSales,
   updateProductStock,
 };

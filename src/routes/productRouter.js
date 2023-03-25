@@ -1,39 +1,28 @@
-const { Router } = require("express");
-const router = Router();
-const { Product } = require("../db.js");
+const express = require("express");
+const router = express.Router();
+const productController = require("../controllers/productController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-// Sample data source
-// Get all users
-router.get("/", (req, res) => {
-  res.json(getAllUser());
-});
-// Get a user by ID
-router.get("/:id", (req, res) => {
-  const user = users.find((u) => u.id === parseInt(req.params.id));
-  if (!user) return res.status(404).send("User not found");
-  res.json(user);
-});
-// Create a new user
-router.post("/", (req, res) => {
-  const newUser = {
-    id: users.length + 1,
-    name: req.body.name,
-  };
-  users.push(newUser);
-  res.status(201).json(newUser);
-});
-// Update a user
-router.put("/:id", (req, res) => {
-  const user = users.find((u) => u.id === parseInt(req.params.id));
-  if (!user) return res.status(404).send("User not found");
-  user.name = req.body.name;
-  res.json(user);
-});
-// Delete a user
-router.delete("/:id", (req, res) => {
-  const userIndex = users.findIndex((u) => u.id === parseInt(req.params.id));
-  if (userIndex === -1) return res.status(404).send("User not found");
-  users.splice(userIndex, 1);
-  res.status(204).send();
-});
+// Rutas para productos
+router.get("/", productController.getAllProducts);
+router.get("/:id", productController.getProductById);
+router.post(
+  "/",
+  authMiddleware.protect,
+  authMiddleware.adminOnly,
+  productController.createProduct
+);
+router.put(
+  "/:id",
+  authMiddleware.protect,
+  authMiddleware.adminOnly,
+  productController.updateProduct
+);
+router.delete(
+  "/:id",
+  authMiddleware.protect,
+  authMiddleware.adminOnly,
+  productController.deleteProduct
+);
+
 module.exports = router;
