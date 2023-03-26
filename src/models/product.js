@@ -31,12 +31,14 @@ const productSchema = new mongoose.Schema(
     },
     stock: {
       type: Number,
-      required: true,
+      default: 0,
     },
-    image: {
-      type: String,
-      required: true,
-    },
+    images: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     numReviews: {
       type: Number,
     },
@@ -56,8 +58,7 @@ const productSchema = new mongoose.Schema(
     ],
     ratingProduct: {
       type: Number,
-      default: 0,
-      required: true,
+      default: 5,
     },
     sales: {
       type: Number,

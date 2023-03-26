@@ -1,7 +1,9 @@
 const server = require("./src/app.js");
 const mongoose = require("mongoose");
-const connectionString =
-  "mongodb+srv://admin:U4GRvBSVc8J1EViD@pf-henry.vzbpdsv.mongodb.net/PF-henry";
+require("dotenv").config();
+const { DB_TEXT } = process.env;
+
+const connectionString = DB_TEXT;
 server.listen(3000, () => {
   mongoose
     .connect(connectionString, {
