@@ -4,7 +4,9 @@ const Product = require("../models/Product");
 // Obtener todos los productos
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({}).select(
+      "-numReviews -reviews -ratingProduct -createdAt -updatedAt -stock -sales"
+    );
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });

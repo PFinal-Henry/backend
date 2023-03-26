@@ -6,7 +6,6 @@ const bcrypt = require("bcrypt");
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     // Verificar si el usuario existe en la base de datos
     const user = await User.findOne({ email });
     if (!user) {
